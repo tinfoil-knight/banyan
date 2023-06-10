@@ -32,4 +32,18 @@ defmodule DnsHeader do
       header.num_additionals::2*8
     >>
   end
+
+  def parse(header) do
+    <<id::2*8, flags::2*8, num_questions::2*8, num_answers::2*8, num_authorities::2*8,
+      num_additionals::2*8>> = header
+
+    %DnsHeader{
+      id: id,
+      flags: flags,
+      num_questions: num_questions,
+      num_answers: num_answers,
+      num_authorities: num_authorities,
+      num_additionals: num_additionals
+    }
+  end
 end
