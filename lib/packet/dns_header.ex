@@ -7,11 +7,17 @@ defmodule DnsHeader do
             num_additionals: 0
 
   @type t :: %DnsHeader{
+          # ID
           id: integer,
+          # QR, OPCODE, AA, TC, RD, RA, Z, RCODE flags
           flags: integer,
+          # QDCOUNT
           num_questions: integer,
+          # ANCOUNT
           num_answers: integer,
+          # NSCOUNT
           num_authorities: integer,
+          # ARCOUNT
           num_additionals: integer
         }
 
