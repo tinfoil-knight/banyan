@@ -6,6 +6,7 @@ defmodule DnsHeader do
             num_authorities: 0,
             num_additionals: 0
 
+  # Header section format - https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.1
   @type t :: %DnsHeader{
           # ID
           id: integer,
