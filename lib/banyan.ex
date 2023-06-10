@@ -10,7 +10,7 @@ defmodule Banyan do
     # https://www.erlang.org/doc/man/gen_udp.html#recv-2
     {_addr, _port, packet} = response
     bytes = Enum.into(packet, <<>>, fn byte -> <<byte::8>> end)
-    <<header_bytes::binary-size(12), _rest::binary>> = bytes
-    DnsHeader.parse(header_bytes)
+    <<header_bytes::binary-size(12), rest::binary>> = bytes
+    [DnsHeader.parse(header_bytes), DnsQuestion.parse(rest)]
   end
 end

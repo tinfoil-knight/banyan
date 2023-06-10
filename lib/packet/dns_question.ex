@@ -41,4 +41,26 @@ defmodule DnsQuestion do
     question = %DnsQuestion{name: name, type: record_type, class: @class_i}
     DnsHeader.to_bin(header) <> DnsQuestion.to_bin(question)
   end
+
+  def decode_name(name, count \\ 0, parts \\ []) do
+    case name do
+      <<0::1*8, _rest::binary>> ->
+        {count + 1, Enum.join(parts, ".")}
+
+      <<length::1*8, rest::binary>> ->
+        <<part::binary-size(length), left::binary>> = rest
+        decode_name(left, count + 1 + length, parts ++ [part])
+    end
+  end
+
+  def parse(data) do
+    {name_byte_count, name} = decode_name(data)
+    <<_::name_byte_count*8, type::2*8, class::2*8, _rest::binary>> = data
+
+    %DnsQuestion{
+      name: name,
+      type: type,
+      class: class
+    }
+  end
 end
