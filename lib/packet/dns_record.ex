@@ -45,12 +45,17 @@ defmodule DnsRecord do
     <<_::read_pos*8, type::2*8, class::2*8, ttl::4*8, data_len::2*8, rest::binary>> = data
     <<record_data::data_len*8>> = rest
 
-    %DnsRecord{
-      name: name,
-      type: type,
-      class: class,
-      ttl: ttl,
-      data: record_data
+    new_pos = read_pos + (10 + data_len)
+
+    {
+      %DnsRecord{
+        name: name,
+        type: type,
+        class: class,
+        ttl: ttl,
+        data: record_data
+      },
+      new_pos
     }
   end
 end

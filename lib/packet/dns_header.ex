@@ -33,7 +33,9 @@ defmodule DnsHeader do
     >>
   end
 
-  def parse(header) do
+  def parse(data) do
+    <<header::binary-size(12), _::binary>> = data
+
     <<id::2*8, flags::2*8, num_questions::2*8, num_answers::2*8, num_authorities::2*8,
       num_additionals::2*8>> = header
 

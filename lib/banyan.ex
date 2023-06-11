@@ -14,13 +14,8 @@ defmodule Banyan do
     {_addr, _port, packet} = response
     bytes = Enum.into(packet, <<>>, fn byte -> <<byte::8>> end)
 
-    <<header_bytes::binary-size(12), rest::binary>> = bytes
-    header = DnsHeader.parse(header_bytes)
-    {question, q_byte_count} = DnsQuestion.parse(rest)
-    pos = 12 + q_byte_count
-    record = DnsRecord.parse(bytes, pos)
     IO.inspect(bytes)
-    IO.inspect([header, question, record])
+    IO.inspect(DnsPacket.parse(bytes))
     {:ok, self()}
   end
 end
