@@ -27,3 +27,6 @@ banyan-*.tar
 
 # Elixir-LS
 /.elixir_ls/
+
+# IDE
+/.vscode/

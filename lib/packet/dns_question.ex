@@ -57,10 +57,13 @@ defmodule DnsQuestion do
     {name_byte_count, name} = decode_name(data)
     <<_::name_byte_count*8, type::2*8, class::2*8, _rest::binary>> = data
 
-    %DnsQuestion{
-      name: name,
-      type: type,
-      class: class
+    {
+      %DnsQuestion{
+        name: name,
+        type: type,
+        class: class
+      },
+      name_byte_count + 4
     }
   end
 end
