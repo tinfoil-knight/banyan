@@ -28,6 +28,7 @@ defmodule DnsQuestion do
 
   import Bitwise
 
+  # queries go to the authoritative nameserver if this flag isn't
   @recursion_desired 1 <<< 8
   # see https://datatracker.ietf.org/doc/html/rfc1035#section-3.2.2
   @type_a 1
@@ -37,7 +38,7 @@ defmodule DnsQuestion do
   def build_query(domain_name, record_type \\ @type_a) do
     name = DnsQuestion.encode_dns_name(domain_name)
     id = 0..65535 |> Enum.random()
-    header = %DnsHeader{id: id, num_questions: 1, flags: @recursion_desired}
+    header = %DnsHeader{id: id, num_questions: 1, flags: 0}
     question = %DnsQuestion{name: name, type: record_type, class: @class_i}
     DnsHeader.to_bin(header) <> DnsQuestion.to_bin(question)
   end

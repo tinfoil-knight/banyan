@@ -33,17 +33,14 @@ defmodule DnsPacket do
     }
   end
 
-  defp read_record(data, pos, num_record) do
+  defp read_record(data, pos, num_record, result \\ []) do
     case num_record do
       0 ->
-        {[], pos}
+        {result, pos}
 
       _ ->
-        Enum.reduce(1..num_record, {[], pos}, fn _i, acc ->
-          {records, pos} = acc
-          {record, new_pos} = DnsRecord.parse(data, pos)
-          {records ++ [record], new_pos}
-        end)
+        {record, new_pos} = DnsRecord.parse(data, pos)
+        read_record(data, new_pos, num_record - 1, result ++ [record])
     end
   end
 end
