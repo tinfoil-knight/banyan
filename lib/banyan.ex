@@ -21,7 +21,7 @@ defmodule Banyan do
 
   @root_ns_ip "198.41.0.4"
 
-  def resolve(domain_name, record_type, nameserver \\ @root_ns_ip) do
+  def resolve(domain_name, record_type \\ 1, nameserver \\ @root_ns_ip) do
     IO.puts("querying #{nameserver} for #{domain_name}")
     response = send_query(nameserver, domain_name, record_type)
     # type == 1 refers to A records
@@ -40,7 +40,13 @@ defmodule Banyan do
         nsIP = resolve(ns_domain, 1)
         resolve(domain_name, record_type, nsIP)
 
+      answer = Enum.find(response.answers, fn x -> x.type == 5 end) ->
+        cname = answer.data
+        resolve(cname, record_type, nameserver)
+
       true ->
+        IO.puts("ns:#{nameserver}")
+        IO.inspect(response)
         raise("error while resolution")
     end
   end

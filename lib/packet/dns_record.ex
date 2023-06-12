@@ -49,6 +49,10 @@ defmodule DnsRecord do
         2 ->
           decode_name(data, read_pos + 10)
 
+        # CNAME
+        5 ->
+          decode_name(data, read_pos + 10)
+
         _ ->
           {read_pos + (10 + data_len), rest}
       end
