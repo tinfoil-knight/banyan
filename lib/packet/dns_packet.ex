@@ -1,22 +1,22 @@
-defmodule DnsPacket do
+defmodule Packet do
   defstruct header: nil, questions: [], answers: [], authorities: [], additionals: []
 
-  @type t :: %DnsPacket{
-          header: DnsHeader,
-          questions: [DnsQuestion],
-          answers: [DnsRecord],
-          authorities: [DnsRecord],
-          additionals: [DnsRecord]
+  @type t :: %Packet{
+          header: Header,
+          questions: [Question],
+          answers: [Record],
+          authorities: [Record],
+          additionals: [Record]
         }
 
   def parse(data) do
-    header = DnsHeader.parse(data)
+    header = Header.parse(data)
     pos = 12
 
     {questions, pos} =
       Enum.reduce(1..header.num_questions, {[], pos}, fn _i, acc ->
         {list, pos} = acc
-        {question, new_pos} = DnsQuestion.parse(data, pos)
+        {question, new_pos} = Question.parse(data, pos)
         {list ++ [question], new_pos}
       end)
 
@@ -24,7 +24,7 @@ defmodule DnsPacket do
     {authorities, pos} = read_record(data, pos, header.num_authorities)
     {additionals, _pos} = read_record(data, pos, header.num_additionals)
 
-    %DnsPacket{
+    %Packet{
       header: header,
       questions: questions,
       answers: answers,
@@ -39,7 +39,7 @@ defmodule DnsPacket do
         {result, pos}
 
       _ ->
-        {record, new_pos} = DnsRecord.parse(data, pos)
+        {record, new_pos} = Record.parse(data, pos)
         read_record(data, new_pos, num_record - 1, result ++ [record])
     end
   end

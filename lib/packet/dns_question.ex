@@ -1,7 +1,7 @@
-defmodule DnsQuestion do
+defmodule Question do
   defstruct name: nil, type: nil, class: nil
 
-  @type t :: %DnsQuestion{
+  @type t :: %Question{
           # domain name
           name: binary,
           # record type
@@ -9,7 +9,7 @@ defmodule DnsQuestion do
           class: integer
         }
 
-  def to_bin(%DnsQuestion{} = question) do
+  def to_bin(%Question{} = question) do
     question.name <>
       <<
         question.type::2*8,
@@ -36,11 +36,11 @@ defmodule DnsQuestion do
   @class_i 1
 
   def build_query(domain_name, record_type \\ @type_a) do
-    name = DnsQuestion.encode_dns_name(domain_name)
+    name = Question.encode_dns_name(domain_name)
     id = 0..65535 |> Enum.random()
-    header = %DnsHeader{id: id, num_questions: 1, flags: 0}
-    question = %DnsQuestion{name: name, type: record_type, class: @class_i}
-    DnsHeader.to_bin(header) <> DnsQuestion.to_bin(question)
+    header = %Header{id: id, num_questions: 1, flags: 0}
+    question = %Question{name: name, type: record_type, class: @class_i}
+    Header.to_bin(header) <> Question.to_bin(question)
   end
 
   def decode_name(data, pos, parts \\ []) do
@@ -61,7 +61,7 @@ defmodule DnsQuestion do
     <<_::curr_pos*8, type::2*8, class::2*8, _::binary>> = data
 
     {
-      %DnsQuestion{
+      %Question{
         name: name,
         type: type,
         class: class

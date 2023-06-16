@@ -1,4 +1,4 @@
-defmodule DnsHeader do
+defmodule Header do
   defstruct id: 0,
             flags: 0,
             num_questions: 0,
@@ -7,7 +7,7 @@ defmodule DnsHeader do
             num_additionals: 0
 
   # Header section format - https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.1
-  @type t :: %DnsHeader{
+  @type t :: %Header{
           # ID
           id: integer,
           # QR, OPCODE, AA, TC, RD, RA, Z, RCODE flags
@@ -22,7 +22,7 @@ defmodule DnsHeader do
           num_additionals: integer
         }
 
-  def to_bin(%DnsHeader{} = header) do
+  def to_bin(%Header{} = header) do
     <<
       header.id::2*8,
       header.flags::2*8,
@@ -39,7 +39,7 @@ defmodule DnsHeader do
     <<id::2*8, flags::2*8, num_questions::2*8, num_answers::2*8, num_authorities::2*8,
       num_additionals::2*8>> = header
 
-    %DnsHeader{
+    %Header{
       id: id,
       flags: flags,
       num_questions: num_questions,

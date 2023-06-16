@@ -7,7 +7,7 @@ defmodule Banyan do
   end
 
   def send_query(ip_addr, domain_name, record_type) do
-    query = DnsQuestion.build_query(domain_name, record_type)
+    query = Question.build_query(domain_name, record_type)
     {:ok, socket} = :gen_udp.open(0, [{:active, false}])
     {:ok, host} = :inet.parse_address(to_charlist(ip_addr))
     :gen_udp.send(socket, host, 53, query)
@@ -16,7 +16,7 @@ defmodule Banyan do
     {:ok, recvData} = :gen_udp.recv(socket, 1024)
     {_addr, _port, packet} = recvData
     data = Enum.into(packet, <<>>, fn byte -> <<byte>> end)
-    DnsPacket.parse(data)
+    Packet.parse(data)
   end
 
   @root_ns_ip "198.41.0.4"

@@ -1,7 +1,7 @@
-defmodule DnsRecord do
+defmodule Record do
   defstruct name: nil, type: nil, class: nil, ttl: nil, data: nil
 
-  @type t :: %DnsRecord{
+  @type t :: %Record{
           name: binary,
           type: integer,
           class: integer,
@@ -58,7 +58,7 @@ defmodule DnsRecord do
       end
 
     {
-      %DnsRecord{
+      %Record{
         name: name,
         type: type,
         class: class,
