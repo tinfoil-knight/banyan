@@ -6,11 +6,13 @@ defmodule Banyan do
     {:ok, self()}
   end
 
-  def send_query(ip_addr, domain_name, record_type) do
+  @dns_port 53
+
+  defp send_query(ip_addr, domain_name, record_type) do
     query = Question.build_query(domain_name, record_type)
     {:ok, socket} = :gen_udp.open(0, [{:active, false}])
     {:ok, host} = :inet.parse_address(to_charlist(ip_addr))
-    :gen_udp.send(socket, host, 53, query)
+    :gen_udp.send(socket, host, @dns_port, query)
     # UDP DNS responses are usually less than 512 bytes so reading 1024 bytes is enough
     # see https://www.netmeister.org/blog/dns-size.html
     {:ok, recvData} = :gen_udp.recv(socket, 1024)
@@ -21,28 +23,37 @@ defmodule Banyan do
 
   @root_ns_ip "198.41.0.4"
 
-  def resolve(domain_name, record_type \\ 1, nameserver \\ @root_ns_ip) do
+  def resolve(domain_name, record_type \\ "A") do
+    case Record.type_n2v(record_type) do
+      nil ->
+        raise("unsupported record type: #{record_type}")
+
+      v ->
+        resolve_helper(domain_name, v)
+    end
+  end
+
+  defp resolve_helper(domain_name, record_type, nameserver \\ @root_ns_ip) do
     IO.puts("querying #{nameserver} for #{domain_name}")
     response = send_query(nameserver, domain_name, record_type)
-    # type == 1 refers to A records
-    # type == 2 refers to NS records
+
     cond do
-      answer = Enum.find(response.answers, fn x -> x.type == 1 end) ->
+      answer = Enum.find(response.answers, &Record.match_type(&1.type, "A")) ->
         ip = answer.data
         ip
 
-      additional = Enum.find(response.additionals, fn x -> x.type == 1 end) ->
+      additional = Enum.find(response.additionals, &Record.match_type(&1.type, "A")) ->
         nsIP = additional.data
-        resolve(domain_name, record_type, nsIP)
+        resolve_helper(domain_name, record_type, nsIP)
 
-      authority = Enum.find(response.authorities, fn x -> x.type == 2 end) ->
+      authority = Enum.find(response.authorities, &Record.match_type(&1.type, "NS")) ->
         ns_domain = authority.data
-        nsIP = resolve(ns_domain, 1)
-        resolve(domain_name, record_type, nsIP)
+        nsIP = resolve(ns_domain, "A")
+        resolve_helper(domain_name, record_type, nsIP)
 
-      answer = Enum.find(response.answers, fn x -> x.type == 5 end) ->
+      answer = Enum.find(response.answers, &Record.match_type(&1.type, "CNAME")) ->
         cname = answer.data
-        resolve(cname, record_type, nameserver)
+        resolve_helper(cname, record_type, nameserver)
 
       true ->
         IO.puts("ns:#{nameserver}")

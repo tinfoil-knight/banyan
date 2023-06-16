@@ -30,12 +30,10 @@ defmodule Question do
 
   # queries go to the authoritative nameserver if this flag isn't
   @recursion_desired 1 <<< 8
-  # see https://datatracker.ietf.org/doc/html/rfc1035#section-3.2.2
-  @type_a 1
   # see https://datatracker.ietf.org/doc/html/rfc1035#section-3.2.4
   @class_i 1
 
-  def build_query(domain_name, record_type \\ @type_a) do
+  def build_query(domain_name, record_type) do
     name = Question.encode_dns_name(domain_name)
     id = 0..65535 |> Enum.random()
     header = %Header{id: id, num_questions: 1, flags: 0}
