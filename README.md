@@ -7,6 +7,7 @@ A toy DNS resolver I made while learning Elixir.
 ### Pre-requisites
 
 - [Elixir >= 1.14.5](https://elixir-lang.org/)
+- [IEX](https://hexdocs.pm/iex/1.14/IEx.html)
 
 ### Steps
 
@@ -28,7 +29,7 @@ querying 185.89.219.11 for star-mini.c10r.facebook.com
 "157.240.16.35"
 ```
 
-Note: Only A, NS & CNAME records are supported currently.
+Note: Only querying "A" records is supported currently.
 
 ## Author
 
